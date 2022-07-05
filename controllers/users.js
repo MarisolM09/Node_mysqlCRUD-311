@@ -27,6 +27,7 @@ const createUser = (req, res) => {
   // INSERT INTO USERS FIRST AND LAST NAME 
   const { first_name, last_name } = req.body;
   let sql = "INSERT INTO ?? VALUES (null, ?, ?)";
+ 
   // WHAT GOES IN THE BRACKETS
   sql = mysql.format(sql, ["users", first_name, last_name]);
 
@@ -45,15 +46,18 @@ const updateUserById = (req, res) => {
   sql = mysql.format(sql, ["users", body, "id", id]);
 
   pool.query(sql, (err, results) => {
-    if (err) return handleSQLError(res, err)
-    return res.status(204).json();
-  })
-}
+    if (err) return handleSQLError(res, err);
+    return res.json({
+      affectedRows: results.affectedRows,
+      message: results.message,
+    });
+  });
+};
 
 const deleteUserByFirstName = (req, res) => {
   // DELETE FROM USERS WHERE FIRST NAME = <REQ PARAMS FIRST_NAME>
-  const firstName = req.params.first_name;
-  let sql = "DELETE FROM ?? WHERE ?? = ?;";
+  const { firstName } = req.body;
+  let sql = "DELETE FROM ?? WHERE ?? = ?";
   // WHAT GOES IN THE BRACKETS
   sql = mysql.format(sql, ["users", "first_name", firstName])
 
